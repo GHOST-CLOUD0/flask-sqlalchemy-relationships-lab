@@ -36,7 +36,7 @@ def get_event_sessions(id):
     sessions = [{
         "id": s.id,
         "title": s.title,
-        "start_time": s.start_time.isofformat()
+        "start_time": s.start_time.isoformat()
     } for s in event.sessions]
     return jsonify(
         sessions
@@ -54,13 +54,15 @@ def get_speakers():
 
 @app.route('/speakers/<int:id>')
 def get_speaker(id):
-    speaker =  Speaker.query.get(id)
+    speaker = Speaker.query.get(id)
     if not speaker:
-        return jsonify({
-            "id": speaker.id,
-            "name": speaker.name,
-            "bio_text": speaker.bio_text if speaker.bio else "No bio available"
-        }), 200
+        return jsonify({"error": "Speaker not found"}), 404
+
+    return jsonify({
+        "id": speaker.id,
+        "name": speaker.name,
+        "bio_text": speaker.bio.bio_text if speaker.bio else "No bio available"
+    }), 200
 
 
 @app.route('/sessions/<int:id>/speakers')
@@ -73,7 +75,7 @@ def get_session_speakers(id):
     speakers = [{
         "id": sp.id,
         "name": sp.name,
-        "bio_text": sp.bio_text if sp.bio else "No bio availabe"
+        "bio_text": sp.bio.bio_text if sp.bio else "No bio available"
     } for sp in session.speakers]
     return jsonify(speakers), 200    
 

@@ -9,10 +9,10 @@ metadata = MetaData(naming_convention={
 db = SQLAlchemy(metadata=metadata)
 
 # TODO: add association table
-session_speakers = db.Tables(
-    'session_speaker',
-    db.Co;umn('session_id', db.Interger, db.ForeignKey('session.id'), primary_key=True),
-    db.Co;umn('speaker_id', db.Interger, db.ForeignKey('session.id'), primary_key=True)
+session_speakers = db.Table(
+    'session_speakers',
+    db.Column('session_id', db.Integer, db.ForeignKey('sessions.id'), primary_key=True),
+    db.Column('speaker_id', db.Integer, db.ForeignKey('speakers.id'), primary_key=True)
 )
 
 
@@ -35,10 +35,10 @@ class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     start_time = db.Column(db.DateTime, nullable=False)
-    event_id = db.Column(db.Integer, db,ForeignKey('event.id'))
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
     
     event = db.relationship('Event', back_populates='sessions')
-    speaker = db.relationship('Speaker', secondary=session_speakers, back_populates='sessions')
+    speakers = db.relationship('Speaker', secondary=session_speakers, back_populates='sessions')
 
     def __repr__(self):
         return f'<Session {self.id}, {self.title}, {self.start_time}>'
@@ -50,8 +50,8 @@ class Speaker(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     
-    bio = db.relationship('Bio', back_populates='speakers', useList=False, cascade='all, delete-orphan')
-    sessions = db.relationship('session', secondary=session_speakers, back_populates='speakers')
+    bio = db.relationship('Bio', back_populates='speaker', uselist=False, cascade='all, delete-orphan')
+    sessions = db.relationship('Session', secondary=session_speakers, back_populates='speakers')
 
     def __repr__(self):
         return f'<Speaker {self.id}, {self.name}>'
