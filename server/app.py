@@ -18,27 +18,64 @@ db.init_app(app)
 
 @app.route('/events')
 def get_events():
-    pass
+    events = Event.query.all()
+    return jsonify([{
+        "id": e.id,
+        "name": e.name,
+        "location": e.location
+    } for e in events]), 200
 
 
 @app.route('/events/<int:id>/sessions')
 def get_event_sessions(id):
-    pass
+    event = Event.query.get(id)
+    if not event:
+        return jsonify({
+            "error": "Event not found"
+        }), 404
+    sessions = [{
+        "id": s.id,
+        "title": s.title,
+        "start_time": s.start_time.isofformat()
+    } for s in event.sessions]
+    return jsonify(
+        sessions
+    ), 200    
 
 
 @app.route('/speakers')
 def get_speakers():
-    pass
+    speakers = Speaker.query.all()
+    return jsonify([{
+        "id": sp.id,
+        "name": sp.name,
+    }for sp in speakers]), 200
 
 
 @app.route('/speakers/<int:id>')
 def get_speaker(id):
-    pass
+    speaker =  Speaker.query.get(id)
+    if not speaker:
+        return jsonify({
+            "id": speaker.id,
+            "name": speaker.name,
+            "bio_text": speaker.bio_text if speaker.bio else "No bio available"
+        }), 200
 
 
 @app.route('/sessions/<int:id>/speakers')
 def get_session_speakers(id):
-    pass
+    session = Session.query.get(id)
+    if not session:
+        return jsonify({
+            "error": "Session not found"
+        }), 404
+    speakers = [{
+        "id": sp.id,
+        "name": sp.name,
+        "bio_text": sp.bio_text if sp.bio else "No bio availabe"
+    } for sp in session.speakers]
+    return jsonify(speakers), 200    
 
 
 if __name__ == '__main__':
