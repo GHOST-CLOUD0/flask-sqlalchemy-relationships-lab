@@ -1,6 +1,15 @@
+import sys
+
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from sqlalchemy.ext.associationproxy import association_proxy
+
+# Support imports from both the repository root (``server.models``) and the
+# server directory (``models``) without creating two SQLAlchemy instances.
+if __name__ == "server.models":
+    sys.modules.setdefault("models", sys.modules[__name__])
+elif __name__ == "models":
+    sys.modules.setdefault("server.models", sys.modules[__name__])
 
 metadata = MetaData(naming_convention={
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
